@@ -15,7 +15,7 @@ Call `TaskList` to get all tasks. For every task that exists, call `TaskUpdate` 
 
 If there are no tasks, skip this step.
 
-### 3. Clean up debate teams
+### 2. Clean up debate teams
 
 Look for team config files:
 ```bash

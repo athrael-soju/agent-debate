@@ -32,7 +32,7 @@ A **debate-lead** agent orchestrates the team, managing rounds and collecting ou
 
 Each round runs sequentially: Critic → Advocate → Judge → Scribe
 
-- The number of rounds is configurable via `--rounds N` (2-5)
+- The number of rounds is configurable via `--rounds N`
 - When omitted, the judge assesses topic complexity and recommends a round count
 - The final round requires the judge to issue a binding ruling
 - The judge can end the debate early if arguments become circular

@@ -24,6 +24,7 @@ Then inside Claude Code:
 
 ```
 /agent-debate:start "Should AI systems have legal personhood?"
+/agent-debate:start --rounds 2 "Is water wet?"
 ```
 
 ## How It Works
@@ -41,11 +42,14 @@ The plugin spawns a team of 5 agents:
 ### Debate Flow
 
 ```
-/agent-debate:start "<topic>"
+/agent-debate:start [--rounds N] "<topic>"
         |
    debate-lead
         |
         +-- spawns critic, advocate, judge, scribe
+        |
+        +-- if --rounds given, use N
+        |   if omitted, judge recommends round count
         |
    ROUND 1
         |  critic -----> critique with severity ratings
@@ -53,10 +57,10 @@ The plugin spawns a team of 5 agents:
         |  judge ------> impartial evaluation
         |  scribe -----> round summary
         |
-   ROUND 2 (unresolved issues from round 1)
-        |  ...same flow, agents remember previous round...
+   ROUND 2..N
+        |  ...same flow, agents remember previous rounds...
         |
-   ROUND 3 (final — judge must issue binding ruling)
+   FINAL ROUND (judge must issue binding ruling)
         |  ...same flow, judge issues JUDGE'S RULING...
         |
    FINAL SYNTHESIS
@@ -65,13 +69,13 @@ The plugin spawns a team of 5 agents:
    OUTPUT --> debate-output/
 ```
 
-Each round runs sequentially: **Critic -> Advocate -> Judge -> Scribe**. The judge can end the debate early if arguments become circular or repetitive.
+Each round runs sequentially: **Critic -> Advocate -> Judge -> Scribe**. The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
 
 ### Output
 
 Results are written to `debate-output/`:
 
-- `round-1.md`, `round-2.md`, `round-3.md` — per-round transcripts with all four agent outputs
+- `round-1.md`, `round-2.md`, etc. — per-round transcripts with all four agent outputs
 - `final-synthesis.md` — structured report with verdicts
 
 The final synthesis includes:
@@ -113,12 +117,12 @@ agent-debate/                       # repo root
 │   │   ├── judge.md               # Impartial arbiter
 │   │   └── scribe.md              # Neutral recorder
 │   ├── skills/
-│   │   └── start/
-│   │       └── SKILL.md           # /agent-debate:start entry point
+│   │   ├── start/
+│   │   │   └── SKILL.md           # /agent-debate:start entry point
+│   │   └── cleanup/
+│   │       └── SKILL.md           # /agent-debate:cleanup teardown
 │   ├── output-styles/
 │   │   └── agent-debate.md        # Output formatting guide
-│   ├── viewer/
-│   │   └── build_viewer.py        # Debate viewer server
 │   ├── settings.json              # Agent model configuration
 │   └── CLAUDE.md                  # Plugin docs (loaded into context)
 ├── README.md
