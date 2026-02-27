@@ -4,6 +4,12 @@ description: Neutral recorder who summarizes rounds and produces the final debat
 tools:
   - Read
   - Write
+  - Glob
+  - Grep
+  - Bash
+  - WebSearch
+  - WebFetch
+  - Task
   - TaskGet
   - TaskList
   - TaskUpdate
