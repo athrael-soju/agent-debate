@@ -1,0 +1,9 @@
+{
+  "name": "agent-debate",
+  "version": "0.1.0",
+  "description": "Multi-agent adversarial debate — four agents argue any topic through structured rounds to produce a synthesis",
+  "author": { "name": "athrael-soju", "url": "https://github.com/athrael-soju" },
+  "repository": "https://github.com/athrael-soju/agent-debate",
+  "license": "MIT",
+  "keywords": ["debate", "multi-agent", "adversarial", "team", "argumentation"]
+}
