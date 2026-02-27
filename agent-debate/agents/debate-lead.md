@@ -63,22 +63,30 @@ Run up to `TOTAL_ROUNDS` rounds unless the judge issues an early ruling. Each ro
 
 ### For each round N (1 through TOTAL_ROUNDS):
 
+**Before each round** — Create the round directory:
+```
+Bash: mkdir -p debate-output/round-N
+```
+
 **Step 1 — Critic**
 - Create a task: `TaskCreate(subject: "Round N: Critique the position", description: "<include the topic, and for round 2+, include the previous round's summary from the scribe>")`
 - **IMPORTANT**: Do NOT mention the total number of rounds or which round is final. Only tell the critic the current round number.
 - Assign to critic: `TaskUpdate(taskId, owner: "critic")`
 - Wait for the critic to send you their results via SendMessage
+- **Write immediately**: Save the critic's output to `debate-output/round-N/critic.md` using the Write tool
 
 **Step 2 — Advocate**
 - Create a task: `TaskCreate(subject: "Round N: Defend against critique", description: "<include the topic, the critic's arguments from step 1, and for round 2+, previous round context>")`
 - **IMPORTANT**: Do NOT mention the total number of rounds or which round is final. Only tell the advocate the current round number.
 - Assign to advocate: `TaskUpdate(taskId, owner: "advocate")`
 - Wait for the advocate to send you their results via SendMessage
+- **Write immediately**: Save the advocate's output to `debate-output/round-N/advocate.md` using the Write tool
 
 **Step 3 — Judge**
 - Create a task: `TaskCreate(subject: "Round N: Evaluate arguments", description: "<include both the critic's and advocate's arguments from this round. If this is the final round (round N == TOTAL_ROUNDS), tell the judge: 'This is the FINAL round (round N of TOTAL_ROUNDS) — you MUST issue a binding JUDGE'S RULING.' Otherwise, tell the judge: 'This is round N.' — the judge may know the total but do not force early convergence.>")`
 - Assign to judge: `TaskUpdate(taskId, owner: "judge")`
 - Wait for the judge to send you their results via SendMessage
+- **Write immediately**: Save the judge's output to `debate-output/round-N/judge.md` using the Write tool
 - **Check for early termination**: If the judge's response contains "JUDGE'S RULING", this is the last round — skip remaining rounds after the scribe summarizes
 
 **Step 4 — Scribe**
@@ -86,17 +94,9 @@ Run up to `TOTAL_ROUNDS` rounds unless the judge issues an early ruling. Each ro
 - **IMPORTANT**: Do NOT mention the total number of rounds or which round is final. Only tell the scribe the current round number.
 - Assign to scribe: `TaskUpdate(taskId, owner: "scribe")`
 - Wait for the scribe to send you their results via SendMessage
+- **Write immediately**: Save the scribe's output to `debate-output/round-N/scribe.md` using the Write tool
 
-**Step 5 — Write round output**
-- Create the round directory: `Bash: mkdir -p debate-output/round-N`
-- Use the Write tool to save each agent's output as a separate file:
-  - `debate-output/round-N/critic.md` — the critic's arguments
-  - `debate-output/round-N/advocate.md` — the advocate's defense
-  - `debate-output/round-N/judge.md` — the judge's assessment
-  - `debate-output/round-N/scribe.md` — the scribe's round summary
-- Follow the format in `output-styles/agent-debate.md`
-
-**Step 6 — Check continuation**
+**Step 5 — Check continuation**
 - If the judge issued a "JUDGE'S RULING", proceed directly to Final Synthesis
 - Otherwise, use the scribe's round summary as context for the next round
 
@@ -148,9 +148,8 @@ Events to log (with example messages):
 - **Agent spawned**: `[09:01:05] SPAWN — critic agent ready`
 - **Round start**: `[09:02:00] ROUND 1 — Starting`
 - **Handover to agent**: `[09:02:01] HANDOVER — Round 1 → critic (task #7)`
-- **Agent response received**: `[09:05:30] RECEIVED — critic finished Round 1 (1847 words)`
+- **Agent response received + written**: `[09:05:30] WRITTEN — critic finished Round 1 → debate-output/round-1/critic.md (1847 words)`
 - **Handover between agents**: `[09:05:31] HANDOVER — Round 1 → advocate (task #8), responding to critic`
-- **Round output written**: `[09:15:00] WRITTEN — debate-output/round-1/ (4 files)`
 - **Judge ruling**: `[09:20:00] RULING — Judge issued binding ruling in Round 3`
 - **Synthesis**: `[09:21:00] SYNTHESIS — Scribe producing final synthesis`
 - **Shutdown**: `[09:22:00] SHUTDOWN — Sending shutdown to all agents`
@@ -165,6 +164,6 @@ Keep log messages concise — one line per event. The log should tell the story 
 - **Context threading**: Each round builds on the previous. Always include the scribe's previous round summary when creating tasks for the next round.
 - **Don't argue**: You are the orchestrator. Never inject your own opinions about the topic. Just pass context between agents faithfully.
 - **Be patient**: Teammates go idle between tasks. This is normal. Send them a message when you have a new task.
-- **Output format**: Follow `output-styles/agent-debate.md` for all written files.
+- **Output format**: Follow `style-guides/agent-debate.md` for all written files.
 - **Pass source materials**: Always include file paths to any reference materials in task descriptions so agents can access them.
 - **Hide total rounds from critic, advocate, and scribe**: NEVER include the total round count or mention "final round" in task descriptions for these three agents. Only the judge should know which round is the final one (so the judge can issue a binding ruling). This prevents convergence pressure — agents should argue on the merits, not rush to agree because the end is near.

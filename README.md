@@ -121,7 +121,7 @@ agent-debate/                       # repo root
 │   │   │   └── SKILL.md           # /agent-debate:start entry point
 │   │   └── cleanup/
 │   │       └── SKILL.md           # /agent-debate:cleanup teardown
-│   ├── output-styles/
+│   ├── style-guides/
 │   │   └── agent-debate.md        # Output formatting guide
 │   ├── settings.json              # Agent model configuration
 │   └── CLAUDE.md                  # Plugin docs (loaded into context)
