@@ -2,7 +2,7 @@
 
 ## Citation Format
 
-All agent outputs should use inline citations. The viewer renders these as styled badges/links.
+All agent outputs should use inline citations.
 
 ### Sourced Claims
 ```

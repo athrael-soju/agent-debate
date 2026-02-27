@@ -1,6 +1,6 @@
 ---
 name: cleanup
-description: Stop all debate agents, delete stale teams and tasks, and stop the viewer server
+description: Stop all debate agents, delete stale teams and tasks
 ---
 
 You are running the **agent-debate cleanup** skill — it tears down any running or stale debate infrastructure.
@@ -9,14 +9,7 @@ You are running the **agent-debate cleanup** skill — it tears down any running
 
 Perform all of the following:
 
-### 1. Stop the viewer server
-
-Run:
-```bash
-python viewer/build_viewer.py --stop-server
-```
-
-### 2. Delete stale tasks
+### 1. Delete stale tasks
 
 Call `TaskList` to get all tasks. For every task that exists, call `TaskUpdate` with `status: "deleted"` to remove it.
 
@@ -39,7 +32,7 @@ For each team whose description contains "debate" (case-insensitive):
 
 **Do NOT delete teams that are not debate-related** (e.g., skip teams for other projects).
 
-### 4. Clean up debate output (only if requested)
+### 3. Clean up debate output (only if requested)
 
 If `$ARGUMENTS` contains "all" or "full", also remove the debate output:
 ```bash
@@ -48,10 +41,9 @@ rm -rf debate-output/
 
 Otherwise, leave `debate-output/` intact so the user can still review results.
 
-### 5. Report
+### 4. Report
 
 Tell the user what was cleaned up:
-- Whether the server was stopped
 - How many tasks were deleted
 - Which teams were removed
 - Whether debate-output was cleared
