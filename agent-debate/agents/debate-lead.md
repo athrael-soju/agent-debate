@@ -88,8 +88,13 @@ Run up to `TOTAL_ROUNDS` rounds unless the judge issues an early ruling. Each ro
 - Wait for the scribe to send you their results via SendMessage
 
 **Step 5 — Write round output**
-- Use the Write tool to save the round summary to `debate-output/round-N.md`
-- The round file should include all four outputs (critic, advocate, judge, scribe summary) formatted per `output-styles/agent-debate.md`
+- Create the round directory: `Bash: mkdir -p debate-output/round-N`
+- Use the Write tool to save each agent's output as a separate file:
+  - `debate-output/round-N/critic.md` — the critic's arguments
+  - `debate-output/round-N/advocate.md` — the advocate's defense
+  - `debate-output/round-N/judge.md` — the judge's assessment
+  - `debate-output/round-N/scribe.md` — the scribe's round summary
+- Follow the format in `output-styles/agent-debate.md`
 
 **Step 6 — Check continuation**
 - If the judge issued a "JUDGE'S RULING", proceed directly to Final Synthesis
@@ -128,6 +133,30 @@ The user may provide reference materials (papers, PDFs, documents) alongside the
    Agents should read these materials and cite them as primary sources in their arguments.
    ```
 3. All agents have `Read`, `Bash`, `WebSearch`, and `WebFetch` tools. They can read files, extract PDF text, and search the web for additional evidence.
+
+## Logging
+
+Maintain a running log file at `debate-output/debate.log` so the user can monitor progress in real-time (e.g., via `tail -f debate-output/debate.log`).
+
+**Log every significant event** by appending to the log file using Bash:
+```
+Bash: echo "[$(date '+%H:%M:%S')] <message>" >> debate-output/debate.log
+```
+
+Events to log (with example messages):
+- **Setup**: `[09:01:02] SETUP — Creating team and spawning agents`
+- **Agent spawned**: `[09:01:05] SPAWN — critic agent ready`
+- **Round start**: `[09:02:00] ROUND 1 — Starting`
+- **Handover to agent**: `[09:02:01] HANDOVER — Round 1 → critic (task #7)`
+- **Agent response received**: `[09:05:30] RECEIVED — critic finished Round 1 (1847 words)`
+- **Handover between agents**: `[09:05:31] HANDOVER — Round 1 → advocate (task #8), responding to critic`
+- **Round output written**: `[09:15:00] WRITTEN — debate-output/round-1/ (4 files)`
+- **Judge ruling**: `[09:20:00] RULING — Judge issued binding ruling in Round 3`
+- **Synthesis**: `[09:21:00] SYNTHESIS — Scribe producing final synthesis`
+- **Shutdown**: `[09:22:00] SHUTDOWN — Sending shutdown to all agents`
+- **Complete**: `[09:22:30] COMPLETE — Debate finished (3 rounds, 12 files written)`
+
+Keep log messages concise — one line per event. The log should tell the story of the debate's execution at a glance.
 
 ## Important Rules
 

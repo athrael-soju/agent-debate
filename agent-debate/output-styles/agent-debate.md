@@ -33,24 +33,48 @@ See [Stanford Law Review analysis](https://example.com/article) for details
 - Advocate cited "Non-Existent Paper" -- this source does not appear to exist
 ```
 
-## Round Summaries (`round-N.md`)
+## Round Output Structure (`debate-output/round-N/`)
 
-Each round file should follow this structure:
+Each round gets its own folder with independent files per agent:
 
+```
+debate-output/
+  round-1/
+    critic.md
+    advocate.md
+    judge.md
+    scribe.md
+  round-2/
+    ...
+  final-synthesis.md
+```
+
+### `critic.md`
 ```markdown
-# Round N
+# Round N — Critic
 
-## Critic's Arguments
 [Structured critique with severity ratings and citations]
+```
 
-## Advocate's Defense
+### `advocate.md`
+```markdown
+# Round N — Advocate
+
 [Point-by-point rebuttal with evidence and citations]
+```
 
-## Judge's Assessment
+### `judge.md`
+```markdown
+# Round N — Judge
+
 [Impartial evaluation of both sides, including fact-check report]
+```
 
-## Round Summary
-[Scribe's neutral summary: resolved issues, open issues, concessions, trajectory]
+### `scribe.md`
+```markdown
+# Round N — Scribe Summary
+
+[Neutral summary: resolved issues, open issues, concessions, trajectory]
 ```
 
 ## Final Synthesis (`final-synthesis.md`)
