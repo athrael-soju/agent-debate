@@ -6,16 +6,18 @@ Built on Claude Code's **Team agents** feature — each debater is an independen
 
 ## Quick Start
 
-### Install
+### From the marketplace
+
+```bash
+claude plugin marketplace add athrael-soju/kimchi-cult
+claude plugin install agent-debate@kimchi-cult
+```
+
+### For local development
 
 ```bash
 git clone https://github.com/athrael-soju/agent-debate.git
-```
-
-### Run
-
-```bash
-claude --plugin-dir ./agent-debate
+claude --plugin-dir ./agent-debate/agent-debate
 ```
 
 Then inside Claude Code:
@@ -100,23 +102,27 @@ This persistent context is what makes the debate feel like a real conversation r
 ## Project Structure
 
 ```
-agent-debate/
-├── .claude-plugin/
-│   └── plugin.json           # Plugin manifest
-├── agents/
-│   ├── debate-lead.md        # Team lead — orchestrates rounds
-│   ├── critic.md             # Adversarial thinker
-│   ├── advocate.md           # Rigorous defender
-│   ├── judge.md              # Impartial arbiter
-│   └── scribe.md             # Neutral recorder
-├── skills/
-│   └── start/
-│       └── SKILL.md          # /agent-debate:start entry point
-├── output-styles/
-│   └── agent-debate.md       # Output formatting guide
-├── settings.json             # Agent model configuration
-├── CLAUDE.md                 # Plugin docs (loaded into context)
-├── LICENSE                   # MIT
+agent-debate/                       # repo root
+├── agent-debate/                   # plugin directory
+│   ├── .claude-plugin/
+│   │   └── plugin.json            # Plugin manifest
+│   ├── agents/
+│   │   ├── debate-lead.md         # Team lead — orchestrates rounds
+│   │   ├── critic.md              # Adversarial thinker
+│   │   ├── advocate.md            # Rigorous defender
+│   │   ├── judge.md               # Impartial arbiter
+│   │   └── scribe.md              # Neutral recorder
+│   ├── skills/
+│   │   └── start/
+│   │       └── SKILL.md           # /agent-debate:start entry point
+│   ├── output-styles/
+│   │   └── agent-debate.md        # Output formatting guide
+│   ├── viewer/
+│   │   └── build_viewer.py        # Debate viewer server
+│   ├── settings.json              # Agent model configuration
+│   └── CLAUDE.md                  # Plugin docs (loaded into context)
+├── README.md
+├── LICENSE                         # MIT
 └── .gitignore
 ```
 
