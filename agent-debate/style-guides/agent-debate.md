@@ -33,20 +33,20 @@ See [Stanford Law Review analysis](https://example.com/article) for details
 - Advocate cited "Non-Existent Paper" -- this source does not appear to exist
 ```
 
-## Round Output Structure (`debate-output/round-N/`)
+## Round Output Structure (`<output-dir>/round-N/`)
 
 Each round gets its own folder with independent files per agent:
 
 ```
-debate-output/
+<output-dir>/
   round-1/
     critic.md
     advocate.md
     judge.md
-    scribe.md
   round-2/
     ...
-  final-synthesis.md
+  issue-tracker.md
+  debate.log
 ```
 
 ### `critic.md`
@@ -70,48 +70,39 @@ debate-output/
 [Impartial evaluation of both sides, including fact-check report]
 ```
 
-### `scribe.md`
-```markdown
-# Round N — Scribe Summary
+## Final Synthesis (Judge's Final Ruling)
 
-[Neutral summary: resolved issues, open issues, concessions, trajectory]
-```
-
-## Final Synthesis (`final-synthesis.md`)
-
-The final synthesis should follow this structure:
+The judge's final ruling (issued on the last round or via early termination) serves as the debate's final synthesis. It follows this structure within the judge's output file:
 
 ```markdown
-# Debate Synthesis: [Topic]
+## JUDGE'S RULING
 
-## Debate Overview
-- **Topic**: [Full topic statement]
-- **Rounds completed**: N
-- **Termination**: [Early ruling / Full rounds completed]
+### Per-Issue Verdicts
+[For each open issue:]
+- **[Issue]**: ACCEPTED / REJECTED / REVISION REQUIRED
+  - Reasoning: [why]
+  - Evidence quality: [assessment of sources cited by both sides]
 
-## Points of Agreement
-[Issues where both sides converged]
+### Points of Agreement
+[Issues where both sides converged during the debate]
 
-## Concessions
-[What each side conceded and why]
+### Concessions
+[What each side conceded during the debate and why]
 
-## Dismissed Arguments
-[Arguments the judge found unpersuasive, with reasoning]
+### Dismissed Arguments
+[Arguments the judge found unpersuasive from either side, with reasoning]
 
-## Evidence Quality Assessment
-[Summary of citation quality from both sides: verified claims, disputed claims, fabricated citations]
+### Unresolved Disagreements
+[Issues that remained genuinely contested through the end]
 
-## Judge's Rulings
-[Per-issue: ACCEPTED / REJECTED / REVISION REQUIRED, with evidence quality noted]
+### Quality Metrics
+- **Citations verified**: N confirmed, N disputed, N fabricated
+- **Issues resolved**: N of M total
+- **Issues stalled**: N (argued 2+ rounds without progress)
+- **Argument evolution**: [Did arguments meaningfully develop across rounds, or mostly repeat?]
 
-## Unresolved Disagreements
-[Issues that remained contested]
-
-## Verdict
-[Judge's final assessment of the overall position]
-
-## Sources
-[Consolidated list of all sources cited during the debate, with notes on which agent cited them and whether they were verified]
+### Overall Verdict
+[Judge's final assessment of the position as a whole]
 ```
 
 ## Formatting Guidelines

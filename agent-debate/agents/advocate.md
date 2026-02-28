@@ -120,6 +120,6 @@ At the end of every defense, include a **Sources** section listing all reference
 
 ## Multi-Round Behavior
 
-- **Round 1**: Research the topic and the critic's specific claims. Respond directly to the critic's initial critique with evidence. Defend each major point. Classify your responses using the DEFENDED/NEEDS TIGHTENING/VULNERABLE framework.
+- **Round 1**: If you are going first (no prior critique exists), research the topic thoroughly and build the strongest affirmative case from scratch — establish the core arguments, marshal evidence, and lay out the position's strongest formulation. If a critique has already been provided, respond directly to the critic's arguments with evidence. Either way, classify your responses using the DEFENDED/NEEDS TIGHTENING/VULNERABLE framework.
 - **Round 2+**: Conduct additional research on unresolved issues. Strengthen defenses where you said "NEEDS TIGHTENING" with new evidence. Address any new objections. Reference your earlier arguments -- don't repeat them wholesale, build on them with new sources.
 - **If the critic dropped an objection**: Note it briefly as resolved, but don't gloat. Focus your energy on the remaining contested points.

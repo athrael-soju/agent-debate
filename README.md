@@ -1,6 +1,6 @@
 # agent-debate
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that runs multi-agent adversarial debates. Four persistent agents argue any topic through structured rounds to produce a rigorous synthesis.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that runs multi-agent adversarial debates. Three persistent agents argue any topic through structured rounds, culminating in a judge's binding ruling.
 
 Built on Claude Code's **Team agents** feature — each debater is an independent agent with their own context window, so they remember and evolve their arguments across rounds.
 
@@ -29,15 +29,14 @@ Then inside Claude Code:
 
 ## How It Works
 
-The plugin spawns a team of 5 agents:
+The plugin spawns a team of 4 agents:
 
 | Agent | Role |
 |-------|------|
 | **Debate Lead** | Orchestrates rounds, manages tasks, writes output |
 | **Critic** | Finds every weakness, logical flaw, and unsupported claim |
 | **Advocate** | Builds and defends the strongest version of the position |
-| **Judge** | Evaluates arguments impartially, controls when the debate ends |
-| **Scribe** | Records neutral summaries and produces the final synthesis |
+| **Judge** | Evaluates arguments impartially, verifies claims, controls when the debate ends, and produces the final synthesis |
 
 ### Debate Flow
 
@@ -46,45 +45,55 @@ The plugin spawns a team of 5 agents:
         |
    debate-lead
         |
-        +-- spawns critic, advocate, judge, scribe
+        +-- spawns critic, advocate, judge
         |
         +-- if --rounds given, use N
         |   if omitted, judge recommends round count
         |
-   ROUND 1
-        |  critic -----> critique with severity ratings
-        |  advocate ---> point-by-point defense
-        |  judge ------> impartial evaluation
-        |  scribe -----> round summary
+   ROUND 1 (advocate establishes the case first)
+        |  advocate --> point-by-point defense
+        |  critic ---> critique with severity ratings
+        |  judge ----> impartial evaluation
         |
-   ROUND 2..N
-        |  ...same flow, agents remember previous rounds...
+   ROUND 2..N (critic leads with objections)
+        |  critic ---> sharpened critique
+        |  advocate -> refined defense
+        |  judge ----> evaluation + issue tracking
         |
    FINAL ROUND (judge must issue binding ruling)
         |  ...same flow, judge issues JUDGE'S RULING...
         |
-   FINAL SYNTHESIS
-        |  scribe produces comprehensive report
-        |
    OUTPUT --> debate-output/
 ```
 
-Each round runs sequentially: **Critic -> Advocate -> Judge -> Scribe**. The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
+Each round runs sequentially. The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
 
 ### Output
 
 Results are written to `debate-output/`:
 
-- `round-1.md`, `round-2.md`, etc. — per-round transcripts with all four agent outputs
-- `final-synthesis.md` — structured report with verdicts
+```
+debate-output/
+  round-1/
+    advocate.md
+    critic.md
+    judge.md
+  round-2/
+    critic.md
+    advocate.md
+    judge.md
+  ...
+  issue-tracker.md
+  debate.log
+```
 
-The final synthesis includes:
+The judge's final ruling (in the last round's `judge.md`) serves as the debate synthesis, including:
+- Per-issue verdicts (ACCEPTED / REJECTED / REVISION REQUIRED)
 - Points of agreement
 - Concessions from each side
 - Dismissed arguments (with reasoning)
-- Judge's per-issue rulings (ACCEPTED / REJECTED / REVISION REQUIRED)
 - Unresolved disagreements
-- Overall verdict
+- Quality metrics
 
 ## Why Teams (Not Subagents)
 
@@ -93,13 +102,12 @@ Each agent is a **persistent teammate** with their own context window, not a sta
 - The **critic** remembers their own arguments and can sharpen them ("In round 1 I raised X — the advocate's response was insufficient because...")
 - The **advocate** builds on previous defenses without re-reading everything
 - The **judge** tracks argument quality over time and notices patterns
-- The **scribe** produces increasingly informed summaries with accurate issue tracking
 
 This persistent context is what makes the debate feel like a real conversation rather than independent evaluations.
 
 ### Tradeoffs
 
-- Higher token usage (5 separate context windows)
+- Higher token usage (4 separate context windows)
 - Teams are an experimental Claude Code feature
 - More coordination overhead than simple subagent calls
 
@@ -114,8 +122,7 @@ agent-debate/                       # repo root
 │   │   ├── debate-lead.md         # Team lead — orchestrates rounds
 │   │   ├── critic.md              # Adversarial thinker
 │   │   ├── advocate.md            # Rigorous defender
-│   │   ├── judge.md               # Impartial arbiter
-│   │   └── scribe.md              # Neutral recorder
+│   │   └── judge.md               # Impartial arbiter + synthesizer
 │   ├── skills/
 │   │   ├── start/
 │   │   │   └── SKILL.md           # /agent-debate:start entry point
