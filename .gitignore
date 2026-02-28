@@ -1,2 +1,3 @@
 debate-output/
 __pycache__/
+.env
