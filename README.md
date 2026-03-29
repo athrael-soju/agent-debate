@@ -55,15 +55,11 @@ The plugin creates a team of 3 agents, orchestrated by a debate-lead:
         +-- if --evidence given, index directory
         |   and include file listing in every task
         |
-   ROUND 1 (advocate establishes the case first)
-        |  advocate --> research + point-by-point defense
-        |  critic ---> research + critique with severity ratings
-        |  judge ----> fact-check + impartial evaluation
-        |
-   ROUND 2..N (critic leads with objections)
-        |  critic ---> sharpened critique with new evidence
-        |  advocate -> refined defense with new evidence
-        |  judge ----> evaluation + issue tracking
+   EVERY ROUND (advocate always goes first)
+        |  advocate --> research + defense (Round 1: from scratch, Round 2+: responds to prior critique)
+        |  lead -----> writes handoff notes (debate-lead.md)
+        |  critic ---> research + critique of advocate's defense
+        |  judge ----> fact-check + evaluation + issue tracking
         |
    FINAL ROUND (judge must issue binding ruling)
         |  ...same flow, judge issues JUDGE'S RULING...
@@ -71,7 +67,11 @@ The plugin creates a team of 3 agents, orchestrated by a debate-lead:
    OUTPUT --> debate-output/
 ```
 
-Each round runs sequentially. The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
+Each round runs sequentially with a consistent order: advocate, then debate-lead handoff, then critic, then judge. The debate-lead **redacts internal sections** (Research Log, Sources, self-assessment labels) when passing output between agents — each side only sees the other's public argument with inline citations. The judge receives full unredacted output to score research effort.
+
+The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
+
+After each advocate and critic turn, the debate-lead outputs a brief progress summary (round number, key points, file path) so you can follow the debate as it unfolds.
 
 ### Research Enforcement
 
@@ -89,11 +89,13 @@ Results are written to `debate-output/`:
 debate-output/
   round-1/
     advocate.md
+    debate-lead.md
     critic.md
     judge.md
   round-2/
-    critic.md
     advocate.md
+    debate-lead.md
+    critic.md
     judge.md
   ...
   issue-tracker.md

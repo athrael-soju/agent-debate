@@ -38,9 +38,10 @@ When an `--evidence` directory is provided, agents must search it for relevant f
 
 ## Debate Flow
 
-**Round 1**: Advocate → Critic → Judge (advocate establishes the case first)
+**Every round**: Advocate → Debate Lead Handoff → Critic → Judge
 
-**Round 2+**: Critic → Advocate → Judge (critic leads with objections)
+- **Round 1**: Advocate builds the initial case from scratch, critic responds
+- **Round 2+**: Advocate responds to the prior round's critique, critic responds to the advocate's updated defense
 
 - The number of rounds is configurable via `--rounds N`
 - When omitted, the judge assesses topic complexity and recommends a round count
@@ -52,7 +53,12 @@ When an `--evidence` directory is provided, agents must search it for relevant f
 
 The debate-lead threads context between rounds via:
 - **Issue tracker**: A running file (`issue-tracker.md`) in the output directory, updated after each round based on the judge's assessment. Tracks resolved, open, and stalled issues.
-- **Task descriptions**: Each round's task descriptions include the issue tracker contents and file paths to prior round outputs, so agents can read the raw arguments for full context.
+- **Redacted handoffs**: When passing one agent's output to the other, the debate-lead strips internal sections (Research Log, Sources, self-assessment labels like DEFENDED/NEEDS TIGHTENING/VULNERABLE). Each agent only sees the other's public argument with inline citations. The judge receives full unredacted output from both sides to score research effort.
+- **Task descriptions**: Each round's task descriptions include the issue tracker contents and file paths to prior round outputs for full context.
+
+## Live Progress
+
+The debate-lead outputs a brief summary to the user after each advocate and critic turn — round number, key points (2-3 bullets), and file path. This provides visibility as the debate unfolds rather than requiring the user to wait for the full debate to complete. Detailed events are also logged to `debate.log` for real-time monitoring via `tail -f`.
 
 ## Output
 
@@ -62,11 +68,13 @@ Results are written to the output directory (typically `debate-output/`, with co
 <output-dir>/
   round-1/
     advocate.md
+    debate-lead.md
     critic.md
     judge.md
   round-2/
-    critic.md
     advocate.md
+    debate-lead.md
+    critic.md
     judge.md
   ...
   issue-tracker.md

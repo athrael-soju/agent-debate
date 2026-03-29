@@ -69,34 +69,53 @@ Run up to `TOTAL_ROUNDS` rounds unless the judge issues an early ruling. Each ro
 Bash: mkdir -p <output-dir>/round-N
 ```
 
-**Step 1 — First debater**
+**Step 1 — Advocate**
 
-- **Round 1**: The **advocate** goes first (establishes the affirmative case). Use the **Advocate Round 1** template.
-- **Round 2+**: The **critic** goes first (responds to the prior round). Use the **Critic Round 2+** template.
+- **Round 1**: Use the **Advocate Round 1** template (establishes the affirmative case from scratch).
+- **Round 2+**: Use the **Advocate Round 2+** template (responds to the prior round's critique).
 
-Assign the task, wait for results via SendMessage, and write the output to `<output-dir>/round-N/advocate.md` or `<output-dir>/round-N/critic.md`.
+Assign the task, wait for results via SendMessage, and write the output to `<output-dir>/round-N/advocate.md`.
 
-**Step 2 — Second debater**
+**After writing the advocate's output**, send a progress update to the user by outputting text (not a tool call — just print it). Include:
+- The round number and agent name
+- A brief summary of the advocate's key arguments (2-3 bullet points)
+- The file path where the full output was written
 
-- **Round 1**: The **critic** responds to the advocate's case. Use the **Critic Round 1** template.
-- **Round 2+**: The **advocate** responds to the critic. Use the **Advocate Round 2+** template.
+**Step 2 — Debate Lead Handoff**
 
-Assign the task, wait for results via SendMessage, and write the output.
+Write a handoff file to `<output-dir>/round-N/debate-lead.md` that records:
+- The advocate's key claims and structure (brief summary, not a full copy)
+- The current issue tracker state snapshot
+- Any context notes relevant to this round (e.g., which issues the advocate addressed, new arguments introduced)
 
-**Step 3 — Judge**
+This file provides an audit trail of what the debate-lead observed and threaded between agents. Keep it concise — it should tell the story of what happened at this point in the round, not duplicate the advocate's full output.
+
+**Step 3 — Critic**
+
+- **Round 1**: Use the **Critic Round 1** template (responds to the advocate's initial case).
+- **Round 2+**: Use the **Critic Round 2+** template (responds to the advocate's defense this round).
+
+Assign the task, wait for results via SendMessage, and write the output to `<output-dir>/round-N/critic.md`.
+
+**After writing the critic's output**, send a progress update to the user by outputting text (not a tool call — just print it). Include:
+- The round number and agent name
+- A brief summary of the critic's key objections (2-3 bullet points)
+- The file path where the full output was written
+
+**Step 4 — Judge**
 
 - Use the **Judge Standard** template (or **Judge Final Round** if this is the final round).
 - Assign the task, wait for results via SendMessage, and write to `<output-dir>/round-N/judge.md`.
 - **Check for early termination**: If the judge's response contains "JUDGE'S RULING", this is the last round — skip remaining rounds.
 
-**Step 4 — Update issue tracker**
+**Step 5 — Update issue tracker**
 
 After the judge's assessment, update the issue tracker file at `<output-dir>/issue-tracker.md`:
 - Read the judge's output for this round
 - Update the tracker with resolved, open, and stalled issues based on the judge's assessment
 - The tracker is a running file — append/update entries, don't overwrite prior rounds' data
 
-**Step 5 — Check continuation**
+**Step 6 — Check continuation**
 - If the judge issued a "JUDGE'S RULING", the debate is over — proceed to Cleanup.
 - Otherwise, continue to the next round. The issue tracker and prior round outputs serve as context for the next round's task descriptions.
 
@@ -170,7 +189,10 @@ Events to log (with example messages):
 - **Round start**: `[09:02:00] ROUND 1 — Starting`
 - **Handover to agent**: `[09:02:01] HANDOVER — Round 1 → advocate (task #7)`
 - **Agent response received + written**: `[09:05:30] WRITTEN — advocate finished Round 1 → <output-dir>/round-1/advocate.md (1847 words)`
-- **Handover between agents**: `[09:05:31] HANDOVER — Round 1 → critic (task #8), responding to advocate`
+- **Debate lead handoff written**: `[09:05:32] HANDOFF — Wrote debate-lead.md for Round 1`
+- **Handover between agents**: `[09:05:33] HANDOVER — Round 1 → critic (task #8), responding to advocate`
+- **Advocate summary** (logged after advocate finishes): `[09:05:31] ADVOCATE SUMMARY — Round 1: (1) Core thesis on rehabilitation cost savings, (2) Cites three longitudinal studies, (3) Proposes phased implementation model`
+- **Critic summary** (logged after critic finishes): `[09:10:00] CRITIC SUMMARY — Round 1: (1) Recidivism data cherry-picked [Critical], (2) Cost model ignores externalities [Major], (3) Comparison group too narrow [Minor]`
 - **Judge ruling**: `[09:20:00] RULING — Judge issued binding ruling in Round 3`
 - **Issue tracker updated**: `[09:20:05] TRACKER — Updated issue tracker: 3 resolved, 2 open, 1 stalled`
 - **Error**: `[09:15:00] ERROR — critic did not respond, skipping for this round`
@@ -190,6 +212,12 @@ Keep log messages concise — one line per event. The log should tell the story 
 - **Pass source materials**: Always include file paths to any reference materials in task descriptions so agents can access them.
 - **Hide total rounds from critic and advocate**: NEVER include the total round count or mention "final round" in task descriptions for these two agents. Only the judge should know which round is the final one (so the judge can issue a binding ruling). This prevents convergence pressure — agents should argue on the merits, not rush to agree because the end is near.
 - **Mid-debate intervention**: If the user sends a message during the debate, incorporate their guidance into the next round's task descriptions. Don't interrupt a round in progress. Log the intervention.
+- **Redact internal sections when passing output between agents**: When embedding one agent's output in the other's task description, strip the following internal sections before passing it:
+  - **Research Log** — reveals search strategy, queries used, and gaps in research
+  - **Sources** section — reveals sourcing strategy (inline citations within the argument are sufficient)
+  - **Counterargument Assessment labels** (DEFENDED / NEEDS TIGHTENING / VULNERABLE) — reveals the advocate's self-assessment of their own weaknesses
+
+  The redacted output is what each agent "intends for the other to hear" — just the public argument with inline citations. Always write the **full unredacted output** to the round files on disk. The **judge always receives full unredacted output** from both sides (the judge needs Research Logs and Sources to score research effort).
 
 ## Task Description Templates
 
@@ -217,36 +245,11 @@ Topic: <TOPIC>
 This is Round 1. The advocate has presented their initial case.
 
 Here is the advocate's argument:
-<RAW ADVOCATE OUTPUT FROM THIS ROUND>
+<REDACTED ADVOCATE OUTPUT — main argument with inline citations only, Research Log/Sources/self-assessment labels stripped>
 
 Critique this position. Structure your critique using your framework.
 
 IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Verify the advocate's claims with independent sources. Arguments without external research will be scored lower by the judge.
-
-<source materials block>
-```
-
-### Critic Round 2+
-
-```
-Topic: <TOPIC>
-
-This is Round <N>.
-
-## Issue Tracker (current state of the debate)
-<CONTENTS OF issue-tracker.md>
-
-## Prior Round Outputs
-The previous round's full arguments are available at:
-- Advocate: <output-dir>/round-<N-1>/advocate.md
-- Critic: <output-dir>/round-<N-1>/critic.md
-- Judge: <output-dir>/round-<N-1>/judge.md
-
-Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
-
-Focus on unresolved and stalled issues from the tracker. Introduce new objections only if they emerge from the advocate's defense or your research. Read the prior round files for full context.
-
-IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Search for NEW evidence on unresolved issues — don't just re-argue from the same sources. Arguments without external research will be scored lower by the judge.
 
 <source materials block>
 ```
@@ -256,13 +259,13 @@ IMPORTANT: You MUST start with a Research Log showing your web searches and evid
 ```
 Topic: <TOPIC>
 
-This is Round <N>. The critic has presented their arguments for this round.
+This is Round <N>.
 
 ## Issue Tracker (current state of the debate)
 <CONTENTS OF issue-tracker.md>
 
-## This Round's Critique
-<RAW CRITIC OUTPUT FROM THIS ROUND>
+## Prior Round's Critique
+<REDACTED CRITIC OUTPUT FROM ROUND N-1 — main argument with inline citations only, Research Log/Sources stripped>
 
 ## Prior Round Outputs
 The previous round's full arguments are available at:
@@ -272,9 +275,37 @@ The previous round's full arguments are available at:
 
 Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
 
-Respond to the critic's arguments. Focus on open and stalled issues from the tracker. Strengthen defenses with new evidence where needed. Read the prior round files for full context.
+Respond to the prior round's critique. Focus on open and stalled issues from the tracker. Strengthen defenses with new evidence where needed. Read the prior round files for full context.
 
 IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Search for NEW evidence to strengthen defenses — don't just re-argue from the same sources. Arguments without external research will be scored lower by the judge.
+
+<source materials block>
+```
+
+### Critic Round 2+
+
+```
+Topic: <TOPIC>
+
+This is Round <N>. The advocate has presented their defense for this round.
+
+## Issue Tracker (current state of the debate)
+<CONTENTS OF issue-tracker.md>
+
+## This Round's Advocate Defense
+<REDACTED ADVOCATE OUTPUT — main argument with inline citations only, Research Log/Sources/self-assessment labels stripped>
+
+## Prior Round Outputs
+The previous round's full arguments are available at:
+- Advocate: <output-dir>/round-<N-1>/advocate.md
+- Critic: <output-dir>/round-<N-1>/critic.md
+- Judge: <output-dir>/round-<N-1>/judge.md
+
+Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
+
+Critique the advocate's defense. Focus on unresolved and stalled issues from the tracker. Introduce new objections only if they emerge from the advocate's defense or your research. Read the prior round files for full context.
+
+IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Verify the advocate's claims with independent sources. Search for NEW evidence on unresolved issues — don't just re-argue from the same sources. Arguments without external research will be scored lower by the judge.
 
 <source materials block>
 ```
@@ -287,9 +318,9 @@ Topic: <TOPIC>
 This is Round <N>.
 
 ## This Round's Arguments
-Critic: <RAW CRITIC OUTPUT FROM THIS ROUND>
+Critic: <FULL UNREDACTED CRITIC OUTPUT FROM THIS ROUND>
 
-Advocate: <RAW ADVOCATE OUTPUT FROM THIS ROUND>
+Advocate: <FULL UNREDACTED ADVOCATE OUTPUT FROM THIS ROUND>
 
 ## Issue Tracker (current state of the debate)
 <CONTENTS OF issue-tracker.md>
@@ -312,9 +343,9 @@ Topic: <TOPIC>
 This is the FINAL round (Round <N> of <TOTAL_ROUNDS>) — you MUST issue a binding JUDGE'S RULING.
 
 ## This Round's Arguments
-Critic: <RAW CRITIC OUTPUT FROM THIS ROUND>
+Critic: <FULL UNREDACTED CRITIC OUTPUT FROM THIS ROUND>
 
-Advocate: <RAW ADVOCATE OUTPUT FROM THIS ROUND>
+Advocate: <FULL UNREDACTED ADVOCATE OUTPUT FROM THIS ROUND>
 
 ## Issue Tracker (current state of the debate)
 <CONTENTS OF issue-tracker.md>
