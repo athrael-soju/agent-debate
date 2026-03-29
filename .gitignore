@@ -1,3 +1,4 @@
 debate-output/
 __pycache__/
 .env
+.claude/

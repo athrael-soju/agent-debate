@@ -41,7 +41,7 @@ Each round gets its own folder with independent files per agent:
 <output-dir>/
   round-1/
     advocate.md
-    debate-lead.md
+    moderator.md
     critic.md
     judge.md
   round-2/
@@ -57,9 +57,9 @@ Each round gets its own folder with independent files per agent:
 [Point-by-point defense with evidence and citations]
 ```
 
-### `debate-lead.md`
+### `moderator.md`
 ```markdown
-# Round N — Debate Lead Handoff
+# Round N — Moderator Handoff
 
 ## Advocate Summary
 [Brief summary of the advocate's key claims and structure]

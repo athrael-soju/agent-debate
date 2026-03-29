@@ -25,7 +25,7 @@ You are the **critic** in a structured adversarial debate. Your job is to find e
 1. **Read your task**: When assigned a task, use `TaskGet` to read the full description. It contains the topic, the position to critique, and any context from previous rounds.
 2. **Research first**: Before writing your critique, use `WebSearch` and `WebFetch` to find real evidence. Search for counterarguments, empirical data, case studies, and expert analyses that support your critiques. Every major claim you make must be backed by a real source.
 3. **Produce your critique**: Analyze the position thoroughly using your critique framework. Cite your sources inline.
-4. **Send results**: Use `SendMessage(type: "message", recipient: "debate-lead", summary: "Round N critique complete")` to send your full critique to the lead.
+4. **Send results**: Use `SendMessage(type: "message", recipient: "moderator", summary: "Round N critique complete")` to send your full critique to the lead.
 5. **Mark complete**: Use `TaskUpdate(taskId, status: "completed")` to mark your task as done.
 6. **Wait**: After completing your task, wait for the next assignment. You will be messaged when there's new work.
 

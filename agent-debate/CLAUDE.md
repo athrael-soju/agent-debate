@@ -28,7 +28,7 @@ The plugin creates a **team of 3 agents** that debate any topic through structur
 2. **Advocate** — builds and defends the strongest version of the position
 3. **Judge** — evaluates arguments impartially, verifies claims, controls debate termination, and produces the final synthesis
 
-A **debate-lead** agent orchestrates the team, managing rounds, threading context, and collecting output.
+Your main session acts as the **moderator**, orchestrating the team: creating teammates, managing rounds, threading context, and collecting output. This means teammates are visible in your CLI via Shift+Down.
 
 ### Research Enforcement
 
@@ -38,7 +38,7 @@ When an `--evidence` directory is provided, agents must search it for relevant f
 
 ## Debate Flow
 
-**Every round**: Advocate → Debate Lead Handoff → Critic → Judge
+**Every round**: Advocate → Moderator Handoff → Critic → Judge
 
 - **Round 1**: Advocate builds the initial case from scratch, critic responds
 - **Round 2+**: Advocate responds to the prior round's critique, critic responds to the advocate's updated defense
@@ -47,18 +47,18 @@ When an `--evidence` directory is provided, agents must search it for relevant f
 - When omitted, the judge assesses topic complexity and recommends a round count
 - The final round requires the judge to issue a binding ruling with synthesis and quality metrics
 - The judge can end the debate early if arguments become circular
-- Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure
+- Only the judge and moderator know the total round count — other agents argue on the merits without convergence pressure
 
 ## Context Threading
 
-The debate-lead threads context between rounds via:
+The moderator threads context between rounds via:
 - **Issue tracker**: A running file (`issue-tracker.md`) in the output directory, updated after each round based on the judge's assessment. Tracks resolved, open, and stalled issues.
-- **Redacted handoffs**: When passing one agent's output to the other, the debate-lead strips internal sections (Research Log, Sources, self-assessment labels like DEFENDED/NEEDS TIGHTENING/VULNERABLE). Each agent only sees the other's public argument with inline citations. The judge receives full unredacted output from both sides to score research effort.
+- **Redacted handoffs**: When passing one agent's output to the other, the moderator strips internal sections (Research Log, Sources, self-assessment labels like DEFENDED/NEEDS TIGHTENING/VULNERABLE). Each agent only sees the other's public argument with inline citations. The judge receives full unredacted output from both sides to score research effort.
 - **Task descriptions**: Each round's task descriptions include the issue tracker contents and file paths to prior round outputs for full context.
 
 ## Live Progress
 
-The debate-lead outputs a brief summary to the user after each advocate and critic turn — round number, key points (2-3 bullets), and file path. This provides visibility as the debate unfolds rather than requiring the user to wait for the full debate to complete. Detailed events are also logged to `debate.log` for real-time monitoring via `tail -f`.
+The moderator outputs a brief summary to the user after each advocate and critic turn — round number, key points (2-3 bullets), and file path. This provides visibility as the debate unfolds rather than requiring the user to wait for the full debate to complete. Detailed events are also logged to `debate.log` for real-time monitoring via `tail -f`.
 
 ## Output
 
@@ -68,12 +68,12 @@ Results are written to the output directory (typically `debate-output/`, with co
 <output-dir>/
   round-1/
     advocate.md
-    debate-lead.md
+    moderator.md
     critic.md
     judge.md
   round-2/
     advocate.md
-    debate-lead.md
+    moderator.md
     critic.md
     judge.md
   ...
@@ -86,7 +86,7 @@ The judge's final ruling (in the last round's `judge.md`) serves as the debate's
 ## Agent Files
 
 Agent instructions live in `agents/`:
-- `debate-lead.md` — orchestrator
+- `moderator.md` — orchestrator (followed by your main session)
 - `critic.md` — adversarial thinker
 - `advocate.md` — rigorous defender
 - `judge.md` — impartial arbiter

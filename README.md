@@ -31,11 +31,11 @@ Then inside Claude Code:
 
 ## How It Works
 
-The plugin creates a team of 3 agents, orchestrated by a debate-lead:
+Your main session acts as the **moderator**, creating a team of 3 agents and orchestrating the debate directly. Because the team is created at the top level, all teammates are visible in your CLI — use **Shift+Down** to cycle through them.
 
 | Agent | Role |
 |-------|------|
-| **Debate Lead** | Orchestrator — manages rounds, threads context, writes output |
+| **Moderator** | Your main session — orchestrates rounds, threads context, writes output |
 | **Critic** | Finds every weakness, logical flaw, and unsupported claim |
 | **Advocate** | Builds and defends the strongest version of the position |
 | **Judge** | Evaluates arguments impartially, fact-checks claims, controls when the debate ends, and produces the final synthesis |
@@ -45,9 +45,9 @@ The plugin creates a team of 3 agents, orchestrated by a debate-lead:
 ```
 /agent-debate:start [--rounds N] [--evidence <path>] "<topic>"
         |
-   debate-lead
+   moderator (your main session)
         |
-        +-- spawns critic, advocate, judge
+        +-- spawns critic, advocate, judge as teammates
         |
         +-- if --rounds given, use N
         |   if omitted, judge recommends round count
@@ -57,7 +57,7 @@ The plugin creates a team of 3 agents, orchestrated by a debate-lead:
         |
    EVERY ROUND (advocate always goes first)
         |  advocate --> research + defense (Round 1: from scratch, Round 2+: responds to prior critique)
-        |  lead -----> writes handoff notes (debate-lead.md)
+        |  moderator -> writes handoff notes (moderator.md)
         |  critic ---> research + critique of advocate's defense
         |  judge ----> fact-check + evaluation + issue tracking
         |
@@ -67,11 +67,11 @@ The plugin creates a team of 3 agents, orchestrated by a debate-lead:
    OUTPUT --> debate-output/
 ```
 
-Each round runs sequentially with a consistent order: advocate, then debate-lead handoff, then critic, then judge. The debate-lead **redacts internal sections** (Research Log, Sources, self-assessment labels) when passing output between agents — each side only sees the other's public argument with inline citations. The judge receives full unredacted output to score research effort.
+Each round runs sequentially with a consistent order: advocate, then moderator handoff, then critic, then judge. The moderator **redacts internal sections** (Research Log, Sources, self-assessment labels) when passing output between agents — each side only sees the other's public argument with inline citations. The judge receives full unredacted output to score research effort.
 
-The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
+The judge can end the debate early if arguments become circular or repetitive. Only the judge and moderator know the total round count — other agents argue on the merits without convergence pressure.
 
-After each advocate and critic turn, the debate-lead outputs a brief progress summary (round number, key points, file path) so you can follow the debate as it unfolds.
+After each advocate and critic turn, the moderator outputs a brief progress summary (round number, key points, file path) so you can follow the debate as it unfolds.
 
 ### Research Enforcement
 
@@ -89,12 +89,12 @@ Results are written to `debate-output/`:
 debate-output/
   round-1/
     advocate.md
-    debate-lead.md
+    moderator.md
     critic.md
     judge.md
   round-2/
     advocate.md
-    debate-lead.md
+    moderator.md
     critic.md
     judge.md
   ...
@@ -122,7 +122,7 @@ This persistent context is what makes the debate feel like a real conversation r
 
 ### Tradeoffs
 
-- Higher token usage (4 separate context windows — debate-lead + 3 agents)
+- Higher token usage (3 separate teammate context windows + your main session)
 - Teams are an experimental Claude Code feature
 - More coordination overhead than simple subagent calls
 
@@ -134,7 +134,7 @@ agent-debate/                       # repo root
 │   ├── .claude-plugin/
 │   │   └── plugin.json            # Plugin manifest
 │   ├── agents/
-│   │   ├── debate-lead.md         # Team lead — orchestrates rounds
+│   │   ├── moderator.md           # Orchestration protocol (followed by your main session)
 │   │   ├── critic.md              # Adversarial thinker
 │   │   ├── advocate.md            # Rigorous defender
 │   │   └── judge.md               # Impartial arbiter + synthesizer
@@ -150,20 +150,6 @@ agent-debate/                       # repo root
 ├── README.md
 ├── LICENSE                         # MIT
 └── .gitignore
-```
-
-## Configuration
-
-`settings.json` sets the debate lead to use the `opus` model for orchestration quality. Teammate agents inherit the default model.
-
-```json
-{
-  "agent": {
-    "debate-lead": {
-      "model": "opus"
-    }
-  }
-}
 ```
 
 ## License
