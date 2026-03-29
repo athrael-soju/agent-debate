@@ -54,9 +54,9 @@ You are the **debate lead**, responsible for orchestrating a structured adversar
    - **If `<rounds>` is `auto`**: Send the judge a message asking them to recommend the round count:
      ```
      SendMessage(type: "message", recipient: "judge", summary: "Recommend debate round count",
-       content: "Before we begin the debate, assess this topic and recommend the number of rounds. Consider the topic's complexity, number of distinct issues, and depth of evidence needed. Respond with just the number and a one-line rationale. The topic is: <topic>THE TOPIC</topic>")
+       content: "Before we begin the debate, assess this topic and recommend the number of rounds. Consider the topic's complexity, number of distinct issues, and depth of evidence needed. Reply via SendMessage with a <number>N</number> tag and a one-line rationale. The topic is: <topic>THE TOPIC</topic>")
      ```
-     Wait for the judge's response. Parse the recommended number and use it as `TOTAL_ROUNDS`.
+     Wait for the judge's response. Parse the number from the `<number>` tag in the reply and use it as `TOTAL_ROUNDS`. If the judge recommends a number outside 1-10, clamp it to that range.
 
 ## Round Execution
 
