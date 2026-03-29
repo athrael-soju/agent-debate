@@ -17,7 +17,7 @@ claude plugin install agent-debate@kimchi-cult
 
 ```bash
 git clone https://github.com/athrael-soju/agent-debate.git
-claude --plugin-dir ./agent-debate/agent-debate
+claude --plugin-dir ./agent-debate 
 ```
 
 Then inside Claude Code:
@@ -33,12 +33,12 @@ Then inside Claude Code:
 
 Your main session acts as the **moderator**, creating a team of 3 agents and orchestrating the debate directly. Because the team is created at the top level, all teammates are visible in your CLI — use **Shift+Down** to cycle through them.
 
-| Agent | Role |
-|-------|------|
-| **Moderator** | Your main session — orchestrates rounds, threads context, writes output |
-| **Critic** | Finds every weakness, logical flaw, and unsupported claim |
-| **Advocate** | Builds and defends the strongest version of the position |
-| **Judge** | Evaluates arguments impartially, fact-checks claims, controls when the debate ends, and produces the final synthesis |
+| Agent         | Role                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Moderator** | Your main session — orchestrates rounds, threads context, writes output                                              |
+| **Critic**    | Finds every weakness, logical flaw, and unsupported claim                                                            |
+| **Advocate**  | Builds and defends the strongest version of the position                                                             |
+| **Judge**     | Evaluates arguments impartially, fact-checks claims, controls when the debate ends, and produces the final synthesis |
 
 ### Debate Flow
 

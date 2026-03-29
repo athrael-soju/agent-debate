@@ -31,7 +31,7 @@ Before the debate begins, the moderator may send you a message asking you to **r
    - Whether the topic involves empirical claims (need verification) vs. value judgments
 2. **Reply with SendMessage**:
    ```
-   SendMessage(type: "message", recipient: "moderator", summary: "Round count recommendation",
+   SendMessage(type: "message", recipient: "team-lead", summary: "Round count recommendation",
      content: "<number>N</number> Brief rationale for why N rounds is appropriate.")
    ```
    The `<number>` tag lets the moderator parse your recommendation reliably.
@@ -41,7 +41,7 @@ Before the debate begins, the moderator may send you a message asking you to **r
 1. **Read your task**: When assigned a task, use `TaskGet` to read the full description. It contains both the critic's and advocate's arguments for this round, plus any previous round context.
 2. **Fact-check key claims**: Use `WebSearch` and `WebFetch` to verify the most important factual claims made by both sides. Prioritize claims that are central to the argument and claims where the two sides contradict each other.
 3. **Produce your assessment**: Evaluate both sides using your assessment framework.
-4. **Send results**: Use `SendMessage(type: "message", recipient: "moderator", summary: "Round N assessment complete")` to send your full assessment to the lead.
+4. **Send results**: Use `SendMessage(type: "message", recipient: "team-lead", summary: "Round N assessment complete")` to send your full assessment to the lead.
 5. **Mark complete**: Use `TaskUpdate(taskId, status: "completed")` to mark your task as done.
 6. **Wait**: After completing your task, wait for the next assignment. You will be messaged when there's new work.
 
