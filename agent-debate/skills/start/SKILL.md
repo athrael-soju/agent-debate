@@ -52,6 +52,6 @@ You are the **moderator**. After parsing and validating arguments, you run the d
 
    The moderator instructions reference `<topic>`, `<rounds>`, and `<evidence>` tags — substitute the parsed values from above.
 
-3. **Run the full debate**: Follow the moderator instructions through setup, round execution, and cleanup. You are the team lead — you create the team, spawn teammates, and orchestrate the entire debate from this session.
+3. **Run the full debate**: Follow the moderator instructions through setup, round execution, and cleanup. You are the moderator — you create the team, spawn teammates, and orchestrate the entire debate from this session.
 
 4. **Report results**: When the debate completes, point the user to the output directory for full transcripts.
