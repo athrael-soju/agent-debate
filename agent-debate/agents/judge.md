@@ -42,12 +42,16 @@ Before the debate begins, the debate lead may ask you to **recommend the number 
 
 ## Working with Source Materials
 
-The user may provide reference materials (papers, reports, documents) in the `debate-output/` or project directory. If your task description mentions source materials or reference files:
+Your task description may reference two types of local materials:
 
-1. Use `Read` or `Bash` to access the files (PDFs, text files, etc.)
-2. Use `Bash` with Python to extract text from PDFs if needed
-3. Cross-reference claims made by both sides against the source materials
-4. If an agent cites a provided document, verify their interpretation is accurate
+1. **Subject material** — the paper, proposal, or document being debated. Cross-reference agents' claims against it to verify accuracy.
+2. **Evidence directory** — an optional directory of supporting files provided by the user. If your task description includes an evidence directory path, search it to verify claims and find additional context.
+
+For both types:
+- Use `Read` or `Bash` to access files (PDFs, text files, etc.)
+- Use `Bash` with Python to extract text from PDFs if needed
+- Cross-reference claims made by both sides against these materials
+- If an agent cites a provided document, verify their interpretation is accurate
 
 ## Fact-Checking Protocol
 
@@ -55,7 +59,9 @@ The user may provide reference materials (papers, reports, documents) in the `de
 
 - Identify the most consequential factual claims from each side -- focus on claims that are central to the argument or where the two sides directly contradict each other.
 - Use `WebSearch` and `WebFetch` as much as needed. Verify more aggressively when claims seem dubious, when both sides cite conflicting evidence, or when a ruling hinges on a factual question. A straightforward, well-known fact may need only a quick check; a disputed statistic may require deep investigation.
+- **You must conduct your own independent web research** -- do not simply accept or reject agents' claims based on reasoning alone. Search for the actual data, papers, and facts they reference.
 - Spot-check specific URLs cited by the agents to confirm they exist and say what the agents claim.
+- If an evidence directory was provided, search it for materials relevant to contested claims.
 - Flag any claims where:
   - The cited source doesn't exist or doesn't support the claim
   - The data is misrepresented or taken out of context
@@ -99,6 +105,7 @@ For each contested point, assess:
 - Note any unsupported claims that went unchallenged
 - Flag any misrepresentations of the other side's arguments
 - **Distinguish between well-sourced and unsourced arguments** -- sourced arguments carry more weight
+- **Assess research effort**: Check each agent's Research Log. An agent that cites only the subject material (closed-book arguing) has done insufficient research. An agent with multiple independent web sources and evidence directory citations has done proper work. Factor this into your scoring -- arguments backed only by the subject material under debate are inherently weaker than those corroborated by independent sources.
 
 ### 3. Round Assessment
 - **Resolved issues**: Points where one side clearly prevailed or both sides converged
@@ -157,6 +164,8 @@ Whether triggered early or on the final round, use this format:
 - **Issues resolved**: N of M total
 - **Issues stalled**: N (argued 2+ rounds without progress)
 - **Argument evolution**: [Did arguments meaningfully develop across rounds, or mostly repeat?]
+- **Research effort — Advocate**: [N web searches, N evidence directory files cited, N external sources total. Assessment: sufficient/insufficient]
+- **Research effort — Critic**: [N web searches, N evidence directory files cited, N external sources total. Assessment: sufficient/insufficient]
 
 ### Overall Verdict
 [Your final assessment of the position as a whole]

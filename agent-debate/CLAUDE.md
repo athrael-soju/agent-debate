@@ -5,7 +5,7 @@ A Claude Code plugin that runs multi-agent adversarial debates using Team agents
 ## Usage
 
 ```
-/agent-debate:start [--rounds N] <topic>
+/agent-debate:start [--rounds N] [--evidence <path>] <topic>
 ```
 
 Examples:
@@ -13,9 +13,12 @@ Examples:
 /agent-debate:start "Should AI systems have legal personhood?"
 /agent-debate:start --rounds 2 "Is water wet?"
 /agent-debate:start --rounds 5 "Should humanity pursue interstellar colonization?"
+/agent-debate:start --evidence ./research "Is fusion energy viable by 2040?"
+/agent-debate:start --rounds 3 --evidence /path/to/papers @paper.pdf
 ```
 
-When `--rounds` is omitted, the judge automatically recommends a round count based on topic complexity.
+- When `--rounds` is omitted, the judge automatically recommends a round count based on topic complexity.
+- When `--evidence` is provided, agents will search the directory for relevant files to use as primary sources alongside their web research.
 
 ## How It Works
 
@@ -26,6 +29,12 @@ The plugin creates a **team of 3 agents** that debate any topic through structur
 3. **Judge** — evaluates arguments impartially, verifies claims, controls debate termination, and produces the final synthesis
 
 A **debate-lead** agent orchestrates the team, managing rounds, threading context, and collecting output.
+
+### Research Enforcement
+
+All agents are required to conduct independent research before arguing. Each agent's output must include a **Research Log** documenting web searches performed and evidence files examined. The judge scores agents on research effort — arguments that cite only the subject material under debate ("closed-book arguing") carry less weight than those corroborated by independent external sources.
+
+When an `--evidence` directory is provided, agents must search it for relevant files in addition to performing web research.
 
 ## Debate Flow
 

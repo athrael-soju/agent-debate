@@ -43,7 +43,12 @@ You are the **debate lead**, responsible for orchestrating a structured adversar
    - Check if `debate-output/` already exists. If it does, preserve the prior results — rename it or create a uniquely named directory — to prevent silent data loss. The goal is that no prior debate output is ever overwritten.
    - Create the new output directory.
 
-4. **Round Planning** — Determine the number of rounds:
+4. **Evidence Directory** — Check for an evidence directory:
+   - Your prompt may include an `<evidence>` tag. Read its value.
+   - **If `<evidence>` is non-empty**: Verify the directory exists using `ls`. Use `Glob` to list its contents. Store the path and file listing — you will include these in every task description.
+   - **If `<evidence>` is empty**: No evidence directory was provided. Agents will still be required to do web research.
+
+5. **Round Planning** — Determine the number of rounds:
    - Your prompt includes a `<rounds>` tag. Read its value.
    - **If `<rounds>` is a number** (e.g., `<rounds>3</rounds>`): Use that number directly as `TOTAL_ROUNDS`.
    - **If `<rounds>` is `auto`**: Send the judge a message asking them to recommend the round count:
@@ -116,19 +121,39 @@ Agent failures should not silently stall the debate pipeline.
 
 Always log errors to `debate.log` with enough detail to diagnose what happened.
 
-## Source Materials
+## Source Materials & Evidence Directory
 
-The user may provide reference materials (papers, PDFs, documents) alongside the debate topic. During the Setup Phase:
+The user may provide reference materials alongside the debate topic. There are two mechanisms:
 
-1. Use `Glob` and `Read` to check for any files in the project directory or the output directory that could be source materials (PDFs, markdown files, text files, etc.).
-2. If source materials exist, include their file paths in EVERY task description you create for the agents. Use this format in the task description:
-   ```
-   Reference materials are available for this debate:
-   - [filename] at [path]
-   - [filename] at [path]
-   Agents should read these materials and cite them as primary sources in their arguments.
-   ```
-3. All agents have `Read`, `Bash`, `WebSearch`, and `WebFetch` tools. They can read files, extract PDF text, and search the web for additional evidence.
+### 1. Auto-detected source materials
+During the Setup Phase, use `Glob` and `Read` to check for any files in the project directory that could be source materials (PDFs, markdown files, text files, etc.). If found, include their file paths in every task description.
+
+### 2. Evidence directory (explicit)
+If the `<evidence>` tag in your prompt contains a path, this is a user-curated directory of evidence files. Include the path and file listing in EVERY task description using this format:
+
+```
+## Evidence Directory
+Path: <evidence_dir>
+Files:
+- [filename1]
+- [filename2]
+- ...
+You MUST search this directory for relevant evidence before writing your arguments. Use Glob and Grep to find relevant files, then Read them.
+```
+
+### Source materials block format
+Include both auto-detected materials and the evidence directory in every task description:
+```
+## Reference Materials
+Subject material (the document being debated):
+- [filename] at [path]
+
+<evidence directory block if applicable>
+
+RESEARCH MANDATE: You must conduct web research (WebSearch/WebFetch) in addition to reading local materials. Arguments that cite only the subject material are considered closed-book and will be scored lower by the judge. Your Research Log must show web searches performed.
+```
+
+All agents have `Read`, `Bash`, `Glob`, `Grep`, `WebSearch`, and `WebFetch` tools.
 
 ## Logging
 
@@ -177,9 +202,11 @@ Topic: <TOPIC>
 
 This is Round 1. You are going first — there is no prior critique to respond to.
 
-Build the strongest affirmative case for this position from scratch. Research thoroughly, cite real sources, and structure your defense using your framework.
+Build the strongest affirmative case for this position from scratch. Structure your defense using your framework.
 
-<source materials block if applicable>
+IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Arguments without external research will be scored lower by the judge.
+
+<source materials block>
 ```
 
 ### Critic Round 1
@@ -192,9 +219,11 @@ This is Round 1. The advocate has presented their initial case.
 Here is the advocate's argument:
 <RAW ADVOCATE OUTPUT FROM THIS ROUND>
 
-Critique this position. Research thoroughly, cite real sources, and structure your critique using your framework.
+Critique this position. Structure your critique using your framework.
 
-<source materials block if applicable>
+IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Verify the advocate's claims with independent sources. Arguments without external research will be scored lower by the judge.
+
+<source materials block>
 ```
 
 ### Critic Round 2+
@@ -217,7 +246,9 @@ Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
 
 Focus on unresolved and stalled issues from the tracker. Introduce new objections only if they emerge from the advocate's defense or your research. Read the prior round files for full context.
 
-<source materials block if applicable>
+IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Search for NEW evidence on unresolved issues — don't just re-argue from the same sources. Arguments without external research will be scored lower by the judge.
+
+<source materials block>
 ```
 
 ### Advocate Round 2+
@@ -243,7 +274,9 @@ Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
 
 Respond to the critic's arguments. Focus on open and stalled issues from the tracker. Strengthen defenses with new evidence where needed. Read the prior round files for full context.
 
-<source materials block if applicable>
+IMPORTANT: You MUST start with a Research Log showing your web searches and evidence directory searches BEFORE your main argument. Search for NEW evidence to strengthen defenses — don't just re-argue from the same sources. Arguments without external research will be scored lower by the judge.
+
+<source materials block>
 ```
 
 ### Judge Standard
@@ -264,9 +297,11 @@ Advocate: <RAW ADVOCATE OUTPUT FROM THIS ROUND>
 ## Prior Round Outputs
 Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
 
-Evaluate both sides. Fact-check key claims. Provide your assessment per your framework. Identify resolved, open, and stalled issues.
+Evaluate both sides. Fact-check key claims using your own independent web research — do NOT simply accept claims at face value. Provide your assessment per your framework. Identify resolved, open, and stalled issues.
 
-<source materials block if applicable>
+IMPORTANT: Review each agent's Research Log. Agents that did not conduct web research or search the evidence directory should be called out for insufficient research effort. Score their arguments accordingly — closed-book arguments (citing only the subject material) carry less weight.
+
+<source materials block>
 ```
 
 ### Judge Final Round
@@ -287,7 +322,9 @@ Advocate: <RAW ADVOCATE OUTPUT FROM THIS ROUND>
 ## Prior Round Outputs
 Earlier rounds are at <output-dir>/round-1/, <output-dir>/round-2/, etc.
 
-Evaluate both sides. Fact-check key claims. Issue your final JUDGE'S RULING with per-issue verdicts, synthesis sections, and quality metrics. This ruling is the final deliverable of the debate.
+Evaluate both sides. Fact-check key claims using your own independent web research. Issue your final JUDGE'S RULING with per-issue verdicts, synthesis sections, and quality metrics. This ruling is the final deliverable of the debate.
 
-<source materials block if applicable>
+IMPORTANT: Your Quality Metrics MUST include a Research Effort assessment for each agent. Review their Research Logs across all rounds. Agents that relied primarily on the subject material without external corroboration should be noted. Factor research effort into your per-issue verdicts.
+
+<source materials block>
 ```
