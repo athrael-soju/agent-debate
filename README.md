@@ -25,23 +25,25 @@ Then inside Claude Code:
 ```
 /agent-debate:start "Should AI systems have legal personhood?"
 /agent-debate:start --rounds 2 "Is water wet?"
+/agent-debate:start --evidence ./research "Is fusion energy viable by 2040?"
+/agent-debate:start --rounds 3 --evidence /path/to/papers "Should we colonize Mars?"
 ```
 
 ## How It Works
 
-The plugin spawns a team of 4 agents:
+The plugin creates a team of 3 agents, orchestrated by a debate-lead:
 
 | Agent | Role |
 |-------|------|
-| **Debate Lead** | Orchestrates rounds, manages tasks, writes output |
+| **Debate Lead** | Orchestrator — manages rounds, threads context, writes output |
 | **Critic** | Finds every weakness, logical flaw, and unsupported claim |
 | **Advocate** | Builds and defends the strongest version of the position |
-| **Judge** | Evaluates arguments impartially, verifies claims, controls when the debate ends, and produces the final synthesis |
+| **Judge** | Evaluates arguments impartially, fact-checks claims, controls when the debate ends, and produces the final synthesis |
 
 ### Debate Flow
 
 ```
-/agent-debate:start [--rounds N] "<topic>"
+/agent-debate:start [--rounds N] [--evidence <path>] "<topic>"
         |
    debate-lead
         |
@@ -50,14 +52,17 @@ The plugin spawns a team of 4 agents:
         +-- if --rounds given, use N
         |   if omitted, judge recommends round count
         |
+        +-- if --evidence given, index directory
+        |   and include file listing in every task
+        |
    ROUND 1 (advocate establishes the case first)
-        |  advocate --> point-by-point defense
-        |  critic ---> critique with severity ratings
-        |  judge ----> impartial evaluation
+        |  advocate --> research + point-by-point defense
+        |  critic ---> research + critique with severity ratings
+        |  judge ----> fact-check + impartial evaluation
         |
    ROUND 2..N (critic leads with objections)
-        |  critic ---> sharpened critique
-        |  advocate -> refined defense
+        |  critic ---> sharpened critique with new evidence
+        |  advocate -> refined defense with new evidence
         |  judge ----> evaluation + issue tracking
         |
    FINAL ROUND (judge must issue binding ruling)
@@ -67,6 +72,14 @@ The plugin spawns a team of 4 agents:
 ```
 
 Each round runs sequentially. The judge can end the debate early if arguments become circular or repetitive. Only the judge and debate-lead know the total round count — other agents argue on the merits without convergence pressure.
+
+### Research Enforcement
+
+All agents must conduct independent web research before arguing. Each agent's output includes a **Research Log** documenting:
+- Web searches performed and key findings
+- Evidence directory files examined (if `--evidence` was provided)
+
+The judge scores research effort in the final ruling — arguments that cite only the subject material ("closed-book arguing") carry less weight than those corroborated by independent sources. Fabricated citations are flagged as serious offenses.
 
 ### Output
 
@@ -107,7 +120,7 @@ This persistent context is what makes the debate feel like a real conversation r
 
 ### Tradeoffs
 
-- Higher token usage (4 separate context windows)
+- Higher token usage (4 separate context windows — debate-lead + 3 agents)
 - Teams are an experimental Claude Code feature
 - More coordination overhead than simple subagent calls
 
